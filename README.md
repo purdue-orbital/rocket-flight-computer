@@ -3,7 +3,7 @@
 Flight Computer Repository
 ==========================
 
-This is the GitHub repository for all scripts pertaining to Purdue Orbital's *Hapsis Project* balloon flight computer. Software is coded in Python for use on a Raspberry Pi Model 3 B+.
+This is the GitHub repository for all scripts pertaining to Purdue Orbital's *Hapsis Project* rocket flight computer. Note that it's a clone of `purdue-orbital/balloon-flight-computer`, minus some unnecessary features. Software is coded in Python for use on a Raspberry Pi Model 3 B+.
 
 
 ## Getting Started ##
