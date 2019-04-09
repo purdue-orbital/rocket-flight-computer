@@ -2,6 +2,9 @@ import serial
 import json
 import time
 from RadioModule import Module
+from smbus2 import SMBusWrapper
+
+#test
 
 class SerialPort():
     """
@@ -43,12 +46,7 @@ class SerialPort():
             }
         }
         self.ser = serial.Serial(self.port, 115200)   # -, baud rate (from Arduino)
-        try:
-            self.radio = Module.get_instance(self)  # Initialize radio communication
-        except Exception as e:
-            print(e)
-        print("Initialization complete.")
-
+        
     def writeDict(self):
         """
         Reads from Serial connection and writes to dict
@@ -74,7 +72,7 @@ class SerialPort():
             self.json["Accelerometer"]["y"] = lst[11]
             self.json["Accelerometer"]["z"] = lst[12]
 
-    def JSONpass(self, manager):
+    def JSONpass(self):
         """
         Overwrites dict with sensor data and sends over radio
 
@@ -82,11 +80,9 @@ class SerialPort():
             manager: A Manager() dict object passed through by config.py
         """
         self.writeDict()
-        manager = self.json    # Add json to Manager() to pass to comm_parse
-        try:
-            self.radio.send(json.dumps(self.json))  # Send json over radio
-        except Exception as e:
-            print(e)
+
+           #(json.dumps(self.json))  # Send json over radio
+
 
     def speedTest(self, dur):
         """
@@ -101,3 +97,32 @@ class SerialPort():
             self.writeDict()
             i = i + 1
         print("\nPolling rate: {} Hz\n".format(i / dur))
+  
+  
+    if __name__ == "__main__":
+        
+    #main function definition
+
+    print("Running data_aggr.py ...\n")
+    # Create new serial port for sensor arduino with name and USB port path
+    try:
+        port = "/dev/ttyUSB0"
+        ino = SerialPort("rocket", port)
+
+        # ino.speedTest(10)
+
+        while True: # Iterates infinitely, sending JSON objects over radio
+            ino.JSONpass()
+
+    except OSError:     # Raised when Arduino isn't connected
+        print("No such file or directory {}.\n".format(port))
+        
+    
+    address = 0x60 #update to actual address?
+    
+    Json_String =json.dumps(self.json)
+    Json_Byte_Array = Json_String.getBytes() #need the json string in bytes to send over i2c
+    
+    with SMBussWrapper(1) as bus:
+        bus.write_i2c_block_data(address, 0, Json_Byte_Array)
+
