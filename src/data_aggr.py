@@ -11,7 +11,7 @@ class SerialPort():
     Object to control serial port functionality.
     """
 
-    def __init__(self, name, port):
+    def __init__(self, name, port, address):
         """
         Initializes the Port object
 
@@ -21,6 +21,7 @@ class SerialPort():
             manager: A Manager() dict object passed through by config.py
         """
         print("\nInitializing {} on port {}...".format(name, port))
+        self.address = address #address of the i2c connection
         self.name = name
         self.port = port    # serial connection port
         self.json = {"Pressure": 0,   # Initialize dictionary structure
@@ -80,6 +81,11 @@ class SerialPort():
             manager: A Manager() dict object passed through by config.py
         """
         self.writeDict()
+        Json_String =json.dumps(self.json)
+        Json_Byte_Array = Json_String.getBytes() #need the json string in bytes to send over i2c
+    
+        with SMBussWrapper(1) as bus:
+            bus.write_i2c_block_data(self.address, 0, Json_Byte_Array)
 
            #(json.dumps(self.json))  # Send json over radio
 
@@ -118,11 +124,7 @@ class SerialPort():
         print("No such file or directory {}.\n".format(port))
         
     
-    address = 0x60 #update to actual address?
     
-    Json_String =json.dumps(self.json)
-    Json_Byte_Array = Json_String.getBytes() #need the json string in bytes to send over i2c
     
-    with SMBussWrapper(1) as bus:
-        bus.write_i2c_block_data(address, 0, Json_Byte_Array)
+    
 
