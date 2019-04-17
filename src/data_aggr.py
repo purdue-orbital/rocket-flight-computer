@@ -3,7 +3,7 @@ import json
 import time
 from RadioModule import Module
 from smbus2 import SMBusWrapper
-
+import serial
 #test
 
 class SerialPort():
@@ -81,11 +81,15 @@ class SerialPort():
             manager: A Manager() dict object passed through by config.py
         """
         self.writeDict()
-        Json_String =json.dumps(self.json)
+        ser = serial.Serial(self.port) #create a serial connection
+        
+        Json_String =json.dumps(self.json) 
         Json_Byte_Array = Json_String.getBytes() #need the json string in bytes to send over i2c
+        ser.write(Json_Byte_Array) #send the json byte array over the port
+        ser.close()
     
-        with SMBussWrapper(1) as bus:
-            bus.write_i2c_block_data(self.address, 0, Json_Byte_Array)
+        #with SMBussWrapper(1) as bus: #commented out i2c since you can't have a master master connection on the pi's
+        #    bus.write_i2c_block_data(self.address, 0, Json_Byte_Array)
 
            #(json.dumps(self.json))  # Send json over radio
 
